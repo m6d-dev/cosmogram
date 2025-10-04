@@ -1,0 +1,19 @@
+from rest_framework.viewsets import ModelViewSet
+from drf_spectacular.utils import extend_schema
+from src.apps.content.models.post import Post
+from src.apps.content.serializers import ListPostSerializer, PostSerializer
+from src.apps.content.services.post import post_service
+from src.utils.conts import ViewAction
+
+
+@extend_schema(tags=["content"])
+class PostAPIView(ModelViewSet):
+    model = Post
+
+    def get_serializer_class(self):
+        if self.action == ViewAction.CREATE:
+            return PostSerializer
+        return ListPostSerializer
+    
+    def get_queryset(self):
+        return post_service.filter(created_by_id=self.request.user.id)
