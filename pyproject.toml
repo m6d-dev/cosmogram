@@ -1,0 +1,29 @@
+[project]
+name = "ZeroOps"
+version = "0.0.1"
+authors = [
+    {name = "Muhammad",email = "muhammadjon8757@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.5"
+factory-boy = "^3.3.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.1.0"
+black = "^25.1.0"
+ruff = "^0.9.10"
+ipython = "^9.0.2"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "src.config.test"
