@@ -73,13 +73,19 @@ class UserMeSerializer(serializers.Serializer):
     display_name = serializers.CharField()
     username = serializers.CharField()
     email = serializers.EmailField()
+    avatar = serializers.ImageField()
     subscription_count = serializers.IntegerField()
     subscribers_count = serializers.IntegerField()
 
 
-class AvatarSetSerializer(serializers.Serializer):
-    ...
+class AvatarSetSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=True)
 
+    class Meta:
+        model = User
+        fields = (
+            "avatar",
+        )
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:

@@ -28,5 +28,9 @@ urlpatterns = [
     path(
         "profile/update/",
         ProfileAPIView.as_view({"patch": "profile_update"})
+    ),
+    path(
+        "profile/avatar/",
+        ProfileAPIView.as_view({"patch": "set_avatar"})
     )
 ]

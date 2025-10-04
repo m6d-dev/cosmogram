@@ -28,10 +28,17 @@ class User(AbstractBaseUser, AbstractTimestampsModel):
 
     posts_count = models.IntegerField(default=0)
 
+    avatar = models.ImageField(upload_to="avatars/", verbose_name="Файл")
+
     objects = UserManager()
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
+
+    @property
+    def extension(self) -> str:
+        return self.avatar.name.split(".")[-1]
+
 
     def __str__(self):
         return self.username

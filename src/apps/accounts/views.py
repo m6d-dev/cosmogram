@@ -104,13 +104,20 @@ class ProfileAPIView(ViewSet):
             return AvatarSetSerializer
         if self.action == "profile_update":
             return UpdateProfileSerializer
-        
         if self.action == "get_me":
             return UserMeSerializer
 
     @transaction.atomic
     def set_avatar(self, request, *args, **kwargs):
-        ...
+        instance = request.user
+        serializer = self.get_serializer_class()(
+            instance=instance,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     def get_me(self, request, *args, **kwargs):
         instance = request.user
