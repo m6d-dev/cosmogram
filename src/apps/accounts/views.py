@@ -1,7 +1,10 @@
 from src.apps.accounts.serializers.accounts import (
     RegistrationStep1Serializer,
     RegistrationStep2Serializer,
+    UserMeSerializer,
 )
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from src.apps.accounts.services.accounts import user_service
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -13,6 +16,7 @@ from src.utils.functions import (
     ensure_otp_cooldown,
     generate_random_string,
     get_otp_expire_time,
+    raise_validation_error_detail,
     send_confirm_email,
 )
 
@@ -46,7 +50,7 @@ class RegistrationAPIView(ViewSet):
         serializer.save()
         return Response(
             data={
-                "data": "Ссылка для подтверждения регистрации отправлена на вашу почту."
+                "data": "Код для подтверждения регистрации отправлена на вашу почту."
             },
             status=status.HTTP_201_CREATED,
         )
@@ -59,7 +63,7 @@ class RegistrationAPIView(ViewSet):
         serializer = self.get_serializer_class()(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_service.confirm_user_url(
-            serializer.validated_data.get("confirmation_url"),
+            serializer.validated_data.get("otp"),
             serializer.validated_data.get("email"),
         )
         return Response(
@@ -72,7 +76,7 @@ class RegistrationAPIView(ViewSet):
         user = user_service.get(id=kwargs.get("id"))
 
         ensure_otp_cooldown(user)
-        check_field_confirmed(user, "email_verified")
+        check_field_confirmed(user, "confirmed")
 
         user.otp = generate_random_string(14)
         user.otp_expire_time = get_otp_expire_time()
@@ -87,3 +91,13 @@ class RegistrationAPIView(ViewSet):
             },
             status=status.HTTP_200_OK,
         )
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET"])
+def get_me(request, *args, **kwargs):
+    instance = user_service.filter(id=request.user.id).first()
+    if not instance:
+        raise_validation_error_detail("Аккаунт не найден")
+
+    serializer = UserMeSerializer(instance)
+    return Response(serializer.data, status=status.HTTP_200_OK)

@@ -8,7 +8,7 @@ from . import swagger
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path(f"{PREFIX_API_VERSION}/", include("src.apps.accounts.urls")),
+    path("api/auth/", include("src.apps.accounts.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -63,3 +63,15 @@ class RegistrationStep1Serializer(serializers.Serializer):
 class RegistrationStep2Serializer(serializers.Serializer):
     otp = serializers.CharField()
     email = serializers.EmailField()
+
+
+class UserMeSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    confirmed = serializers.BooleanField()
+    is_active = serializers.BooleanField()
+    posts_count = serializers.IntegerField()
+    display_name = serializers.CharField()
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    subscription_count = serializers.IntegerField()
+    subscribers_count = serializers.IntegerField()

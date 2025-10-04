@@ -38,6 +38,10 @@ def get_otp_expire_time():
     return get_datetime() + timedelta(minutes=EMAIL_TOKEN_EXPIRE_MINUTES)
 
 
+def generate_otp(min: int = 10000, max: int = 99999) -> int:
+    return random.randint(min, max)
+
+
 def generate_random_string(length: int = 8) -> str:
     """Generates a random string of specified length.
 

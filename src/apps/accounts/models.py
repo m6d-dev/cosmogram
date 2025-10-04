@@ -21,7 +21,12 @@ class User(AbstractBaseUser, AbstractTimestampsModel):
 
     is_active = models.BooleanField(default=False)
 
-    email_verified = models.BooleanField(default=False)
+    confirmed = models.BooleanField(default=False)
+
+    subscription_count = models.IntegerField(default=0)
+    subscribers_count = models.IntegerField(default=0)
+
+    posts_count = models.IntegerField(default=0)
 
     objects = UserManager()
 
