@@ -6,6 +6,7 @@ from src.utils.bases.models import AbstractTimestampsModel
 
 
 class User(AbstractBaseUser, AbstractTimestampsModel):
+    display_name = models.CharField(max_length=20)
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
 

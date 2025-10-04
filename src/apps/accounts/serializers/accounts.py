@@ -1,3 +1,4 @@
+from httpx import request
 from rest_framework import serializers
 from src.apps.accounts.services.accounts import user_service
 from src.utils.functions import (
@@ -14,6 +15,7 @@ class RegistrationStep1Serializer(serializers.Serializer):
     """
 
     email = serializers.EmailField(required=True)
+    display_name = serializers.CharField(required=True)
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
 
@@ -59,5 +61,5 @@ class RegistrationStep1Serializer(serializers.Serializer):
 
 
 class RegistrationStep2Serializer(serializers.Serializer):
-    confirmation_url = serializers.CharField()
+    otp = serializers.CharField()
     email = serializers.EmailField()
