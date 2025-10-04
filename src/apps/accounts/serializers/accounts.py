@@ -83,19 +83,13 @@ class AvatarSetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            "avatar",
-        )
+        fields = ("avatar",)
+
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = (
-            "username",
-            "email",
-            "display_name"
-        )
+        fields = ("username", "email", "display_name")
 
     def update(self, instance, validated_data):
         return super().update(instance=instance, validated_data=validated_data)
-    

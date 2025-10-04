@@ -39,7 +39,6 @@ class User(AbstractBaseUser, AbstractTimestampsModel):
     def extension(self) -> str:
         return self.avatar.name.split(".")[-1]
 
-
     def __str__(self):
         return self.username
 

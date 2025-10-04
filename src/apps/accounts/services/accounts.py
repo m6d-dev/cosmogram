@@ -5,14 +5,12 @@ from rest_framework import serializers
 from src.utils.functions import (
     confirm_instance_email,
     generate_otp,
-    generate_random_string,
     get_otp_expire_time,
     raise_validation_error_detail,
     validate_otp_until_confirm,
     send_confirm_email,
 )
 from typing import Union
-import os
 
 
 class UserService(AbstractService[User]):
@@ -44,10 +42,7 @@ class UserService(AbstractService[User]):
         user.save()
 
     def _send_confirm_email(self, user: User) -> None:
-        send_confirm_email(
-            confirmation_url=user.otp,
-            email=user.email
-        )
+        send_confirm_email(confirmation_url=user.otp, email=user.email)
 
 
 user_service = UserService()

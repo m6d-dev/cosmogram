@@ -21,16 +21,7 @@ urlpatterns = [
         RegistrationAPIView.as_view({"post": "resend_otp"}),
         name="resend_otp",
     ),
-    path(
-        "profiles/me/",
-        ProfileAPIView.as_view({"get": "get_me"})
-    ),
-    path(
-        "profile/update/",
-        ProfileAPIView.as_view({"patch": "profile_update"})
-    ),
-    path(
-        "profile/avatar/",
-        ProfileAPIView.as_view({"patch": "set_avatar"})
-    )
+    path("profiles/me/", ProfileAPIView.as_view({"get": "get_me"})),
+    path("profile/update/", ProfileAPIView.as_view({"patch": "profile_update"})),
+    path("profile/avatar/", ProfileAPIView.as_view({"patch": "set_avatar"})),
 ]
