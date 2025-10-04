@@ -28,10 +28,12 @@ class PostSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = post_service.create(**validated_data)
         return instance
+
 class ImageSerializer(serializers.Serializer):
     image = serializers.ImageField()
 
 class ListPostSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     title = serializers.CharField()
     content = serializers.CharField()
     images = ImageSerializer(many=True)
