@@ -127,7 +127,7 @@ class ProfileAPIView(ViewSet):
         serializer = self.get_serializer_class()(
             instance=instance,
             data=request.data,
-            partial=True,  # чтобы не требовал все поля
+            partial=True,
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
