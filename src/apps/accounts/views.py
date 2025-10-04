@@ -1,6 +1,8 @@
 from src.apps.accounts.serializers.accounts import (
+    AvatarSetSerializer,
     RegistrationStep1Serializer,
     RegistrationStep2Serializer,
+    UpdateProfileSerializer,
     UserMeSerializer,
 )
 from rest_framework.decorators import api_view, permission_classes
@@ -92,12 +94,41 @@ class RegistrationAPIView(ViewSet):
             status=status.HTTP_200_OK,
         )
 
-@permission_classes([IsAuthenticated])
-@api_view(["GET"])
-def get_me(request, *args, **kwargs):
-    instance = user_service.filter(id=request.user.id).first()
-    if not instance:
-        raise_validation_error_detail("Аккаунт не найден")
+@extend_schema(tags=["profile"])
+class ProfileAPIView(ViewSet):
 
-    serializer = UserMeSerializer(instance)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    permission_classes = (IsAuthenticated,)
+
+    def get_serializer_class(self):
+        if self.action == "set_avatar":
+            return AvatarSetSerializer
+        if self.action == "profile_update":
+            return UpdateProfileSerializer
+        
+        if self.action == "get_me":
+            return UserMeSerializer
+
+    @transaction.atomic
+    def set_avatar(self, request, *args, **kwargs):
+        ...
+
+    def get_me(self, request, *args, **kwargs):
+        instance = request.user
+        if not instance:
+            raise_validation_error_detail("Аккаунт не найден")
+
+        serializer = self.get_serializer_class()(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @transaction.atomic
+    def profile_update(self, request, *args, **kwargs):
+        instance = request.user
+        serializer = self.get_serializer_class()(
+            instance=instance,
+            data=request.data,
+            partial=True,  # чтобы не требовал все поля
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

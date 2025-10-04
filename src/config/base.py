@@ -148,7 +148,7 @@ ASGI_APPLICATION = "src.config.asgi.application"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "ZeroOps System API Documentation",
+    "TITLE": "Cosmogram System API Documentation",
     "DESCRIPTION": "Private API Documentation",
     "VERSION": "v1.0.0-alpha",
 }

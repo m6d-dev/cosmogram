@@ -1,5 +1,5 @@
-from httpx import request
 from rest_framework import serializers
+from src.apps.accounts.models import User
 from src.apps.accounts.services.accounts import user_service
 from src.utils.functions import (
     raise_validation_error_detail,
@@ -54,7 +54,7 @@ class RegistrationStep1Serializer(serializers.Serializer):
         Create a new user user with the validated data.
         """
         try:
-            user = user_service.create(**validated_data)
+            user_service.create(**validated_data)
         except Exception as e:
             raise_validation_error_detail(str(e))
         return validated_data
@@ -75,3 +75,21 @@ class UserMeSerializer(serializers.Serializer):
     email = serializers.EmailField()
     subscription_count = serializers.IntegerField()
     subscribers_count = serializers.IntegerField()
+
+
+class AvatarSetSerializer(serializers.Serializer):
+    ...
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "email",
+            "display_name"
+        )
+
+    def update(self, instance, validated_data):
+        return super().update(instance=instance, validated_data=validated_data)
+    

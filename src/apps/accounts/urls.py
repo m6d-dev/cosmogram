@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path
 
-from src.apps.accounts.views import RegistrationAPIView, get_me
+from src.apps.accounts.views import RegistrationAPIView, ProfileAPIView
 
 urlpatterns = [
     path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
@@ -23,6 +23,10 @@ urlpatterns = [
     ),
     path(
         "profiles/me/",
-        get_me
+        ProfileAPIView.as_view({"get": "get_me"})
+    ),
+    path(
+        "profile/update/",
+        ProfileAPIView.as_view({"patch": "profile_update"})
     )
 ]
