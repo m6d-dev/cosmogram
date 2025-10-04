@@ -1,4 +1,4 @@
-from src.apps.content.models.file import Image
+from src.apps.content.models.image import Image
 from src.utils.bases.models import AbstractAuditableModel, AbstractTimestampsModel
 from django.db import models
 
