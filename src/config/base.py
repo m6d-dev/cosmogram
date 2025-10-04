@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "django_extensions",
     # apps
     "src.apps.accounts",
+    "src.apps.content",
 ]
 
 MIDDLEWARE = [

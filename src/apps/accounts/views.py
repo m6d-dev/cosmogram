@@ -5,7 +5,6 @@ from src.apps.accounts.serializers.accounts import (
     UpdateProfileSerializer,
     UserMeSerializer,
 )
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from src.apps.accounts.services.accounts import user_service
 from rest_framework.viewsets import ViewSet
@@ -94,6 +93,7 @@ class RegistrationAPIView(ViewSet):
             status=status.HTTP_200_OK,
         )
 
+
 @extend_schema(tags=["profile"])
 class ProfileAPIView(ViewSet):
 
@@ -126,7 +126,6 @@ class ProfileAPIView(ViewSet):
 
         serializer = self.get_serializer_class()(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
     @transaction.atomic
     def profile_update(self, request, *args, **kwargs):
