@@ -195,7 +195,7 @@ class ScientificArticleListSerializer(serializers.ModelSerializer, RelativeURLMi
         return Truncator(text).chars(limit)
 
     def get_tags(self, obj):
-        return [t.title for t in obj.tags.all()]
+        return [t.name for t in obj.tags.all()]
 
     def _first_prefetched_image(self, obj):
         images = getattr(obj, "prefetched_images", None)
@@ -234,7 +234,7 @@ class ScientificArticleDetailSerializer(serializers.ModelSerializer, RelativeURL
         )
 
     def get_tags(self, obj):
-        return [t.title for t in obj.tags.all()]
+        return [t.name for t in obj.tags.all()]
 
     def get_authors(self, obj):
         return [a.name for a in obj.authors.all()]
