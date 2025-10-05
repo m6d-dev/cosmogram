@@ -8,12 +8,18 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from src.apps.scientific_article.models import ScientificArticleImage, ScientificArticle, ScientificArticleLike, \
-    ScientificArticleComments
+from src.apps.scientific_article.models import (
+    ScientificArticleImage,
+    ScientificArticle,
+    ScientificArticleLike,
+    ScientificArticleComments,
+)
 from src.apps.scientific_article.serializers.scientific_article import (
     ScientificArticleListSerializer,
     ScientificArticleDetailSerializer,
-    ScientificArticleCreateSerializer, ScientificArticleLikeCreateSerializer, ScientificArticleCommentListSerializer,
+    ScientificArticleCreateSerializer,
+    ScientificArticleLikeCreateSerializer,
+    ScientificArticleCommentListSerializer,
     ScientificArticleCommentCreateSerializer,
 )
 

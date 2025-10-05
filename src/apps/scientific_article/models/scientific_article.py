@@ -50,11 +50,8 @@ class ScientificArticleAuthors(AbstractAuditableModel):
         blank=False,
     )
     scientific_article = models.ForeignKey(
-        "ScientificArticle",
-        on_delete=models.CASCADE,
-        db_index=True
+        "ScientificArticle", on_delete=models.CASCADE, db_index=True
     )
-
 
 
 class ScientificArticleTags(AbstractAuditableModel, AbstractTimestampsModel):
@@ -104,9 +101,7 @@ class ScientificArticleImage(AbstractAuditableModel, AbstractTimestampsModel):
 
 class ScientificArticleLike(AbstractAuditableModel, AbstractTimestampsModel):
     scientific_article = models.ForeignKey(
-        "ScientificArticle",
-        on_delete=models.CASCADE,
-        related_name="likes"
+        "ScientificArticle", on_delete=models.CASCADE, related_name="likes"
     )
 
     updated_at = None

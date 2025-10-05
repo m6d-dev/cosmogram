@@ -58,6 +58,7 @@ class ImageSerializer(serializers.Serializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     created_by = UserSerializer()
+
     class Meta:
         model = Comment
         fields = ("id", "content", "created_by")
@@ -94,6 +95,7 @@ class CreateLikeSerializer(serializers.Serializer):
 
         return attrs
 
+
 class CommentSerializer(serializers.Serializer):
     created_by = serializers.HiddenField(default=serializers.CurrentUserDefault())
     post_id = serializers.IntegerField()
@@ -106,4 +108,3 @@ class CommentSerializer(serializers.Serializer):
         if not post_service.exists(id=value):
             raise_validation_error_detail("Post not found")
         return value
-

@@ -10,15 +10,20 @@ from src.apps.scientific_article.models import (
     ScientificArticleTags,
     ScientificArticleImage,
 )
-from src.apps.scientific_article.models.scientific_article import Author, ScientificArticleAuthors, \
-    ScientificArticleLike, ScientificArticleComments
+from src.apps.scientific_article.models.scientific_article import (
+    Author,
+    ScientificArticleAuthors,
+    ScientificArticleLike,
+    ScientificArticleComments,
+)
 from src.utils.functions import raise_validation_error_detail
 
 
 class UserShortSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    avatar = serializers.ImageField(source="avatar")
+    avatar = serializers.ImageField()
     username = serializers.CharField()
+
 
 class ScientificArticleCommentListSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -103,8 +108,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
             through_rows = []
             for a in authors_data:
                 author_obj, _ = Author.objects.get_or_create(
-                    name=a,
-                    created_by=self._get_user()
+                    name=a, created_by=self._get_user()
                 )
                 through_rows.append(author_obj)
             ScientificArticleAuthors.objects.bulk_create(
@@ -141,9 +145,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("At leat one image is required.")
         titles = [i.get("title") for i in images if i.get("title")]
         if len(titles) != len(set(titles)):
-            raise serializers.ValidationError(
-                "Images titles must be unique. "
-            )
+            raise serializers.ValidationError("Images titles must be unique. ")
         return images
 
 
@@ -179,7 +181,7 @@ class ScientificArticleListSerializer(serializers.ModelSerializer, RelativeURLMi
             "cover_image",
             "file",
             "comments_count",
-            "likes_count"
+            "likes_count",
         )
 
     def get_content_preview(self, obj):
@@ -223,6 +225,7 @@ class ScientificArticleDetailSerializer(serializers.ModelSerializer, RelativeURL
             "tags",
             "images",
             "file",
+            "comments",
         )
 
     def get_tags(self, obj):
@@ -256,9 +259,7 @@ class ScientificArticleDetailSerializer(serializers.ModelSerializer, RelativeURL
 class ScientificArticleLikeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScientificArticleLike
-        fields = (
-            "scientific_article",
-        )
+        fields = ("scientific_article",)
 
     def _get_user(self):
         return self.context["request"].user
@@ -273,7 +274,7 @@ class ScientificArticleLikeCreateSerializer(serializers.ModelSerializer):
 
         ScientificArticleLike.objects.create(
             created_by=self.context["request"].user,
-            scientific_article=scientific_article
+            scientific_article=scientific_article,
         )
 
         scientific_article.likes_count += 1
@@ -281,20 +282,20 @@ class ScientificArticleLikeCreateSerializer(serializers.ModelSerializer):
 
         return scientific_article
 
-class ScientificArticleCommentCreateSerializer(serializers.ModelSerializer, RelativeURLMixin):
+
+class ScientificArticleCommentCreateSerializer(
+    serializers.ModelSerializer, RelativeURLMixin
+):
     class Meta:
         model = ScientificArticleComments
-        fields = (
-            "scientific_article",
-            "content"
-        )
+        fields = ("scientific_article", "content")
 
     def create(self, validated_data):
         scientific_article = validated_data.pop("scientific_article")
         ScientificArticleComments.objects.create(
             scientific_article=scientific_article,
             created_by=self.context["request"].user,
-            **validated_data
+            **validated_data,
         )
 
         scientific_article.comments_count += 1
