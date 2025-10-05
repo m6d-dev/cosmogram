@@ -12,7 +12,7 @@ from src.utils.conts import ViewAction
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from src.utils.functions import raise_validation_error, raise_validation_error_detail
+from src.utils.functions import raise_validation_error_detail
 from rest_framework.decorators import action
 
 @extend_schema(tags=["content"])
@@ -31,7 +31,7 @@ class PostAPIView(ModelViewSet):
         return ListPostSerializer
 
     def get_queryset(self):
-        return post_service.all()
+        return post_service.all().order_by("-created_by")
     
 
     def destroy(self, request, *args, **kwargs):
