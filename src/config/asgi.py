@@ -6,7 +6,7 @@ from channels.db import database_sync_to_async
 from rest_framework_simplejwt.exceptions import TokenError
 
 from src.apps.accounts.models import User
-from src.apps.chat.consumers import ChatConsumer
+from src.apps.chat.consumers import ChatConsumer, NotificationConsumer
 
 
 application = get_asgi_application()
@@ -54,6 +54,10 @@ application = ProtocolTypeRouter(
                         r"ws/chat/<str:token>",
                         ChatConsumer.as_asgi(),
                     ),
+                    path(
+                        r"ws/notifications/<str:token>",
+                        NotificationConsumer.as_asgi(),
+                    )
                 ]
             ),
         ),

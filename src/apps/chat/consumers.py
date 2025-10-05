@@ -1,9 +1,11 @@
 # consumers.py
+from typing import Dict
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.db.models import Q
+from asgiref.sync import sync_to_async
 
 User = get_user_model()
 
@@ -152,3 +154,32 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             }
             for m in reversed(qs)
         ]
+
+
+
+def concat_name(user):
+    return str(user.username)
+
+
+class NotificationConsumer(AsyncJsonWebsocketConsumer):
+    groups: set
+    async def connect(self):
+        self.groups = set()
+        self.user = self.scope["user"]
+        group = await sync_to_async(concat_name)(self.user)
+        await self.add_group(group)
+        await self.accept()
+        print("websocket connected successfully!")
+            
+    async def add_group(self, group):
+        await self.channel_layer.group_add(group, self.channel_name)
+        self.groups.add(group)
+        
+    async def disconnect(self, code):
+        for group in self.groups:
+            await self.channel_layer.group_discard(group, self.channel_layer)
+        await self.disconnect()
+        
+    async def send_notification(self, event: Dict):
+        await self.send_json(content=event["data"])
+        
