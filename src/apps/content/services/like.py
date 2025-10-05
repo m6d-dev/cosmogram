@@ -14,7 +14,7 @@ class LikeService(AbstractService[Like]):
     def create(self, **kwargs):
         instance = super().create(**kwargs)
         post = post_like_service.create(post_id=kwargs.get("post_id"), like=instance)
-        obj = PostLikeNotify(instance.id, post.created_by)
+        obj = PostLikeNotify(instance.id, post.post.created_by)
         obj.notify()
         return instance
 
