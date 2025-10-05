@@ -56,11 +56,11 @@ class ScientificArticleFileSerializer(serializers.Serializer):
 
 class ScientificArticleCreateSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(
-        child=serializers.CharField(max_length=50), required=False
+        child=serializers.CharField(max_length=50), required=False, write_only=True
     )
     file = ScientificArticleFileSerializer(required=True)
-    images = ScientificArticleImageSerializer(many=True, required=True)
-    authors = serializers.CharField(max_length=60, required=True)
+    images = ScientificArticleImageSerializer(many=True, required=True, write_only=True)
+    authors = serializers.CharField(max_length=60, required=True, write_only=True)
 
     class Meta:
         model = ScientificArticle
