@@ -1,6 +1,5 @@
 from typing import Any, List
 from src.apps.content.models.tag import Tag
-from src.apps.content.services.tag import tag_service
 from src.apps.content.models.post import Post, PostImage
 from src.apps.content.services.image import image_service
 from src.apps.content.repositories.post import PostRepository, post_repo
@@ -19,7 +18,7 @@ class PostService(AbstractService[Post]):
         self._set_images(instance=instance, images=images)
         self._set_tags(instance=instance, tags=tags)
         return instance
-    
+
     def update(self, **kwargs):
         images = kwargs.pop("images")
         instance = super().update(**kwargs)
@@ -34,5 +33,6 @@ class PostService(AbstractService[Post]):
 
     def _set_tags(self, instance: Post, tags: List[Tag]):
         instance.tags.set(tags)
+
 
 post_service = PostService()
