@@ -2,7 +2,6 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from src.apps.content.models.like import Like
-from rest_framework import mixins
 from rest_framework.viewsets import ModelViewSet
 from drf_spectacular.utils import extend_schema
 from src.apps.content.models.post import Post
@@ -13,7 +12,7 @@ from src.utils.conts import ViewAction
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from src.utils.functions import raise_validation_error_detail
+from src.utils.functions import raise_validation_error, raise_validation_error_detail
 from rest_framework.decorators import action
 
 @extend_schema(tags=["content"])
@@ -37,7 +36,10 @@ class PostAPIView(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.model.objects.filter(id=kwargs.get("id"), created_by_id=request.user.id)
-        return super().destroy(request, *args, **kwargs)
+        if not instance:
+            raise_validation_error_detail({"data": "Not found"})
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 @extend_schema(tags=["content"])
 class LikeAPIView(GenericViewSet):
