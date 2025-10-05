@@ -19,7 +19,8 @@ ALLOWED_HOSTS = [
     "crm-ecommerce-backend-prod-api-1",
     "127.0.0.1",
     "localhost",
-].extend(os.environ.get("DJANGO_ALLOWED_HOSTS"))
+    "api.cosmogram.us",
+]
 
 INSTALLED_APPS = [
     "daphne",
