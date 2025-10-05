@@ -3,6 +3,8 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from src.apps.content.models.like import Like
 from rest_framework import mixins
+from rest_framework.viewsets import ModelViewSet
+from drf_spectacular.utils import extend_schema
 from src.apps.content.models.post import Post
 from src.apps.content.serializers import ListPostSerializer, PostSerializer
 from src.apps.content.services.post import post_service
@@ -21,7 +23,11 @@ class PostAPIView(ModelViewSet):
     model = Post
 
     def get_serializer_class(self):
-        if self.action in [ViewAction.CREATE, ViewAction.UPDATE, ViewAction.PARTIAL_UPDATE]:
+        if self.action in [
+            ViewAction.CREATE,
+            ViewAction.UPDATE,
+            ViewAction.PARTIAL_UPDATE,
+        ]:
             return PostSerializer
         return ListPostSerializer
 

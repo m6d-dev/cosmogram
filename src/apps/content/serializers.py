@@ -9,13 +9,16 @@ from src.apps.content.models.like import Like
 from src.apps.content.services.post_like import post_like_service
 from src.utils.functions import raise_validation_error_detail
 
+
 class TagField(serializers.SlugRelatedField):
     def to_internal_value(self, data):
         obj, created = tag_service.get_or_create(name=data)
         return obj
 
+
 class TagSerializer(serializers.Serializer):
     name = serializers.CharField()
+
 
 class PostSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
@@ -23,12 +26,7 @@ class PostSerializer(serializers.ModelSerializer):
     )
     created_by = serializers.HiddenField(default=serializers.CurrentUserDefault())
     images_urls = serializers.SerializerMethodField(read_only=True)
-    tags = TagField(
-        slug_field='name',
-        many=True,
-        required=False,
-        queryset=tag_service.all()
-    )
+    tags = TagField(slug_field="name", many=True, queryset=tag_service.all())
 
     def get_images_urls(self, obj):
         return [pi.image.image.url for pi in obj.post_images.all()]
@@ -53,6 +51,7 @@ class PostSerializer(serializers.ModelSerializer):
         instance = super().update(instance=instance, validated_data=validated_data)
         post_service._set_images(instance=instance, images=images)
         return instance
+
 
 class ImageSerializer(serializers.Serializer):
     image = serializers.ImageField()

@@ -13,11 +13,7 @@ class Post(AbstractTimestampsModel, AbstractAuditableModel):
         Image, through="PostImage", related_name="posts", blank=True
     )
 
-    tags = models.ManyToManyField(
-        Tag,
-        related_name="posts",
-        blank=True
-    )
+    tags = models.ManyToManyField(Tag, related_name="posts", blank=True)
 
     def __str__(self):
         return self.title

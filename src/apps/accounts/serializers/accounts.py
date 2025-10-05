@@ -41,7 +41,9 @@ class RegistrationStep1Serializer(serializers.Serializer):
 
     def _validate_username_ascii(self, value):
         if not value.isascii():
-            raise_validation_error_detail("The nickname cannot contain Russian characters")
+            raise_validation_error_detail(
+                "The nickname cannot contain Russian characters"
+            )
 
     def validate_username(self, value):
         if user_service.exists(username=value):

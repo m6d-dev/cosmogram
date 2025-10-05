@@ -1,8 +1,7 @@
 import random
 import string
 from rest_framework import serializers
-from typing import Dict, Union, Optional
-from rest_framework import status
+from typing import Dict, Union
 from datetime import datetime, timedelta
 import pytz
 from django.core.mail import send_mail
@@ -22,18 +21,13 @@ def get_datetime() -> datetime:
     return datetime.now(tz).replace(tzinfo=None)
 
 
-def raise_validation_error_detail(
-    message: str, code: Optional[int] = status.HTTP_400_BAD_REQUEST
-) -> None:
-    raise serializers.ValidationError({"detail": message}, code=code)
-
-
 def validate_string(value: str, error_message: str = None) -> None:
     error_message = error_message or "Строка не должна содержать специальные символы."
     if any(symbol in value for symbol in r"!@#$%^&*+=[]{}\|\\;:<>?"):
         raise_validation_error_detail(error_message)
 
-def raise_validation_error(message: Union[str, Dict]) -> None:
+
+def raise_validation_error_detail(message: Union[str, Dict]) -> None:
     raise serializers.ValidationError(message)
 
 
