@@ -5,9 +5,7 @@ from src.apps.content.models.post import Post
 
 class PostSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
-        child=serializers.ImageField(),
-        required=True,
-        write_only=True
+        child=serializers.ImageField(), required=True, write_only=True
     )
     created_by = serializers.HiddenField(default=serializers.CurrentUserDefault())
     images_urls = serializers.SerializerMethodField(read_only=True)
@@ -29,8 +27,10 @@ class PostSerializer(serializers.ModelSerializer):
         instance = post_service.create(**validated_data)
         return instance
 
+
 class ImageSerializer(serializers.Serializer):
     image = serializers.ImageField()
+
 
 class ListPostSerializer(serializers.Serializer):
     id = serializers.IntegerField()

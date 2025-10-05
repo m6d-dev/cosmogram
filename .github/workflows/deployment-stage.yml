@@ -1,0 +1,86 @@
+on:
+  push:
+    branches:
+      - master
+
+env:
+  # Host specific
+  ENV_FILE: .env.example
+  APP_DIR: $HOME/app
+
+  # SSH specifi
+  REMOTE_HOST: ${{ vars.REMOTE_HOST }}
+  REMOTE_PORT: ${{ vars.REMOTE_HOST_PORT }}
+  REMOTE_USER: ${{ vars.REMOTE_HOST_USER }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.REMOTE_HOST }}
+          username: ${{ env.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_HOST_SSH_PRIVATE_KEY }}
+          port: ${{ env.REMOTE_PORT }}
+
+          script: |
+            set -e
+
+            REPOSITORY_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+            ENV_FILE="${{ env.ENV_FILE }}"
+            BRANCH="master"
+            APP_DIR="${{ env.APP_DIR }}"
+
+            log() {
+                echo $1
+                echo "[$(date +'%Y-%m-%d %H:%M:%S')]: $1" >> deployment.logs
+            }
+
+            log "App dir: $APP_DIR"
+            log "Branch: $BRANCH"
+            log "Environment file: $ENV_FILE"
+            log "Docker Compose file: $DOCKER_COMPOSE_FILE"
+
+            if [ ! -d "$APP_DIR" ]; then
+              log "Workdir $APP_DIR does not exist. Cloning repository..."
+              git clone "$REPOSITORY_URL" "$APP_DIR"
+              log "Repository cloned successfully."
+
+            elif [ ! -d "$APP_DIR/.git" ]; then
+              log "Workdir $APP_DIR is not a git repository. Removing and cloning repository..."
+              rm -rf "$APP_DIR"
+              git clone "$REPOSITORY_URL" "$APP_DIR"
+              log "Repository cloned successfully."
+            fi
+
+            cd "$APP_DIR"
+            log "Current working directory: $(pwd)"
+
+            log "Reset changes and pull the latest changes..."
+            git reset --hard HEAD
+            git checkout "$BRANCH"
+            git pull "$REPOSITORY_URL" "$BRANCH" --rebase
+
+            log "Copying environment file..."
+            cp "$ENV_FILE" .env
+
+            echo "DB_USER=${{ vars.DB_USER }}" >> .env
+            echo "DB_NAME=${{ vars.DB_NAME }}" >> .env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> .env
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+
+            source .env
+
+            echo "Building started at $(date)" >> deployment.logs
+
+            nohup bash -c "
+               docker compose up -d --build
+                    " >> deployment.logs 2>&1 &
+
+            echo "Deployment completed successfully."
+
+            exit 0

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+: "${ENVIRONMENT:?ENVIRONMENT is not set}"
+: "${SERVER_PORT:?SERVER_PORT is not set}"
+: "${PROJECT_DIR:?PROJECT_DIR is not set}"
+
+python3 manage.py migrate
+
+echo "ENVIRONMENT is ${ENVIRONMENT}"
+
+# Установить рабочую директорию
+if [[ ! -d "${PROJECT_DIR}" ]]; then
+    echo "Error: Project directory ${PROJECT_DIR} does not exist."
+    exit 1
+fi
+
+cd "${PROJECT_DIR}"
+echo "Changed to working directory $(pwd)"
+
+mkdir -p media/images
+
+cd media/images
+
+cd "${PROJECT_DIR}"
+
+
+if [[ "${ENVIRONMENT}" == 'development' ]]; then
+    python3 manage.py runserver 0.0.0.0:"${SERVER_PORT}"
+else
+    daphne -p 8000 -b 0.0.0.0 src.config.asgi:application
+fi
+main
