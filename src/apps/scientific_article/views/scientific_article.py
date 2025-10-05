@@ -53,6 +53,7 @@ class ScientificArticleViewSet(ModelViewSet):
         print("DATA:", request.data)
         print("FILES:", request.FILES)
         payload = normalize_strict(request)
+        print("PAYLOAD:", payload)
         serializer = self.get_serializer(data=payload)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
