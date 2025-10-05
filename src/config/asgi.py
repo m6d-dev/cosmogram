@@ -12,7 +12,7 @@ from django.contrib.auth.models import AnonymousUser  # noqa
 from rest_framework_simplejwt.exceptions import TokenError  # noqa
 
 from src.apps.accounts.models import User  # noqa
-from src.apps.chat.consumers import ChatConsumer  # noqa
+from src.apps.chat.consumers import ChatConsumer, NotificationConsumer  # noqa
 
 
 django_asgi_app = get_asgi_application()
@@ -51,6 +51,10 @@ application = ProtocolTypeRouter(
                     path(
                         r"ws/chat/<str:token>",
                         ChatConsumer.as_asgi(),
+                    ),
+                    path(
+                        r"ws/notifications/<str:token>",
+                        NotificationConsumer.as_asgi(),
                     ),
                 ]
             ),

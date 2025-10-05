@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/content/", include("src.apps.content.urls")),
     path("api/scientific-articles/", include("src.apps.scientific_article.urls")),
     path("api/chat/", include("src.apps.chat.urls")),
+    path("api/notifications/", include("src.apps.notifications.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
