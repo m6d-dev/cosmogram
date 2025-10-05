@@ -114,7 +114,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
                 )
                 obj = ScientificArticleAuthors(
                     scientific_article=article,
-                    author_obj=author_obj
+                    author=author_obj
                 )
                 through_rows.append(obj)
             ScientificArticleAuthors.objects.bulk_create(
