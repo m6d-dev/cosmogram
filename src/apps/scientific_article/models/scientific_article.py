@@ -28,7 +28,7 @@ class ScientificArticle(AbstractAuditableModel, AbstractTimestampsModel):
         related_name="scientific_articles",
     )
     authors = models.ManyToManyField(
-        "authors.Author",
+        "Author",
         through="ScientificArticleAuthors",
     )
     likes_count = models.PositiveIntegerField(default=0)
@@ -37,7 +37,7 @@ class ScientificArticle(AbstractAuditableModel, AbstractTimestampsModel):
     class Meta:
         ordering = ["-created_at"]
         indexes = [
-            Index(fields=["created_at"], name="idx_scientific_article_created_at"),
+            Index(fields=["created_at"], name="idx_scient_article_created_at"),
         ]
 
 
