@@ -3,6 +3,7 @@ from src.apps.accounts.serializers.accounts import UserSerializer
 from src.apps.content.services.post import post_service
 from src.apps.content.services.tag import tag_service
 from src.apps.content.services.like import like_service
+from src.apps.content.services.comment import comment_service
 from src.apps.content.models.post import Post
 from src.apps.content.models.comment import Comment
 from src.utils.functions import raise_validation_error_detail
@@ -56,9 +57,10 @@ class ImageSerializer(serializers.Serializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    created_by = UserSerializer()
     class Meta:
         model = Comment
-        fields = ("id", "content")
+        fields = ("id", "content", "created_by")
 
 
 class ListPostSerializer(serializers.Serializer):
@@ -91,3 +93,17 @@ class CreateLikeSerializer(serializers.Serializer):
             raise_validation_error_detail("You have already liked this post.")
 
         return attrs
+
+class CommentSerializer(serializers.Serializer):
+    created_by = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    post_id = serializers.IntegerField()
+    content = serializers.CharField()
+
+    def create(self, validated_data):
+        return comment_service.create(**validated_data)
+
+    def validate_post_id(self, value):
+        if not post_service.exists(id=value):
+            raise_validation_error_detail("Post not found")
+        return value
+

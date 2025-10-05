@@ -1,10 +1,12 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
+from src.apps.content.models.comment import Comment
 from src.apps.content.models.like import Like
 from src.apps.content.models.post import Post
-from src.apps.content.serializers import ListPostSerializer, PostSerializer
+from src.apps.content.serializers import CommentSerializer, ListPostSerializer, PostSerializer
 from src.apps.content.services.post import post_service
+from src.apps.content.services.comment import comment_service
 from src.apps.content.services.like import like_service
 from src.utils.conts import ViewAction
 from rest_framework.response import Response
@@ -12,12 +14,14 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from src.utils.functions import raise_validation_error_detail
 from rest_framework.decorators import action
-
+from rest_framework.filters import OrderingFilter, SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 @extend_schema(tags=["content"])
 class PostAPIView(ModelViewSet):
     permission_classes = (IsAuthenticated,)
-
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
+    filterset_fields = ("created_by",)
     model = Post
 
     def get_serializer_class(self):
@@ -104,3 +108,27 @@ class LikeAPIView(GenericViewSet):
 
         like_service.delete(instance=like, post_id=post_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@extend_schema(tags=["content"])
+class CommentAPIView(GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    lookup_field = "id"
+    model = Comment
+
+    def get_queryset(self):
+        return comment_service.filter(created_by_id=self.request.user.id)
+
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action == "add_comment":
+            return CommentSerializer
+        return super().get_serializer_class()
+
+
+    @action(detail=False, methods=["post"], url_path="add")
+    def add_comment(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()(data=request.data, context={"request": request, "user": request.user})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
