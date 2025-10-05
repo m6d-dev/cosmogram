@@ -19,9 +19,5 @@ class PostAPIView(ModelViewSet):
             return PostSerializer
         return ListPostSerializer
 
-    def create(self, request, *args, **kwargs):
-        print(f"Here is data: {request.data}.")
-        super().create(request, *args, **kwargs)
-
     def get_queryset(self):
         return post_service.filter(created_by_id=self.request.user.id)
