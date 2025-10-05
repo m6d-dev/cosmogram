@@ -8,7 +8,7 @@ env:
   ENV_FILE: .env.example
   APP_DIR: $HOME/app
 
-  # SSH specific
+  # SSH specifi
   REMOTE_HOST: ${{ vars.REMOTE_HOST }}
   REMOTE_PORT: ${{ vars.REMOTE_HOST_PORT }}
   REMOTE_USER: ${{ vars.REMOTE_HOST_USER }}
