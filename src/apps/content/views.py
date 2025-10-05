@@ -2,8 +2,6 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from src.apps.content.models.like import Like
-from rest_framework.viewsets import ModelViewSet
-from drf_spectacular.utils import extend_schema
 from src.apps.content.models.post import Post
 from src.apps.content.serializers import ListPostSerializer, PostSerializer
 from src.apps.content.services.post import post_service
@@ -14,6 +12,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from src.utils.functions import raise_validation_error_detail
 from rest_framework.decorators import action
+
 
 @extend_schema(tags=["content"])
 class PostAPIView(ModelViewSet):
@@ -32,21 +31,22 @@ class PostAPIView(ModelViewSet):
 
     def get_queryset(self):
         return post_service.all().order_by("-created_by")
-    
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.model.objects.filter(id=kwargs.get("id"), created_by_id=request.user.id)
+        instance = self.model.objects.filter(
+            id=kwargs.get("id"), created_by_id=request.user.id
+        )
         if not instance:
             raise_validation_error_detail({"data": "Not found"})
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 @extend_schema(tags=["content"])
 class LikeAPIView(GenericViewSet):
     permission_classes = (IsAuthenticated,)
     lookup_field = "id"
     model = Like
-
 
     def get_queryset(self):
         return like_service.filter(created_by_id=self.request.user.id)
@@ -57,7 +57,7 @@ class LikeAPIView(GenericViewSet):
                 name="post_id",
                 type=OpenApiTypes.INT,
                 required=True,
-                location=OpenApiParameter.QUERY
+                location=OpenApiParameter.QUERY,
             )
         ]
     )
@@ -83,7 +83,7 @@ class LikeAPIView(GenericViewSet):
                 name="post_id",
                 type=OpenApiTypes.INT,
                 required=True,
-                location=OpenApiParameter.QUERY
+                location=OpenApiParameter.QUERY,
             )
         ]
     )
@@ -96,7 +96,9 @@ class LikeAPIView(GenericViewSet):
         if not post_id:
             raise_validation_error_detail("post_id is required")
 
-        like = like_service.filter(post_id=post_id, created_by_id=request.user.id).first()
+        like = like_service.filter(
+            post_id=post_id, created_by_id=request.user.id
+        ).first()
         if not like:
             raise_validation_error_detail("You haven't liked this post")
 
