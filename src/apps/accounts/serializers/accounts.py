@@ -67,6 +67,12 @@ class RegistrationStep2Serializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
+class UserSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    display_name = serializers.CharField()
+    avatar = serializers.ImageField()
+
 class UserMeSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     confirmed = serializers.BooleanField()
