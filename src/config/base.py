@@ -14,7 +14,10 @@ SECRET_KEY = "django-insecure-c(!p+^7xlmnao&i!o&eijk4tpa=f7d=w1n660+up4wa324g#p$
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = [
+    'api.cosmogram.anbor.tj',
+    'crm-ecommerce-backend-prod-api-1',
+]
 
 INSTALLED_APPS = [
     "daphne",
