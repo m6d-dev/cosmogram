@@ -130,7 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-LANGUAGE_CODE = os.environ.get("DJANGO_LANGUAGE_CODE") or "en-us"
+LANGUAGE_CODE = "en-us"
 TIME_ZONE = os.environ.get("DJANGO_TIME_ZONE") or "UTC"
 
 CONFIRMATION_COLDOWN_MINUTES = 1
