@@ -19,6 +19,7 @@ ALLOWED_HOSTS = [
     "crm-ecommerce-backend-prod-api-1",
     "127.0.0.1",
     "localhost",
+    "api.cosmogram.us",
 ]
 
 INSTALLED_APPS = [
