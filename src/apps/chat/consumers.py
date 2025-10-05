@@ -26,6 +26,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         # Персональная группа — полезно для системных уведомлений
         personal = f"user-{self.user.id}"
+        print(self.channel_layer)
         await self.channel_layer.group_add(personal, self.channel_name)
         self.groups.add(personal)
 
