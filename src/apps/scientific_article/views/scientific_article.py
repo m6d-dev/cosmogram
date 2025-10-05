@@ -4,7 +4,6 @@ from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, DestroyAPIView
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -22,11 +21,11 @@ from src.apps.scientific_article.serializers.scientific_article import (
     ScientificArticleCommentListSerializer,
     ScientificArticleCommentCreateSerializer,
 )
+from src.utils.functions import normalize_strict
 
 
 @extend_schema(tags=["scientific_article"])
 class ScientificArticleViewSet(ModelViewSet):
-    parser_classes = (MultiPartParser, FormParser)
     http_method_names = [
         HTTPMethod.GET.lower(),
         HTTPMethod.POST.lower(),
@@ -53,7 +52,12 @@ class ScientificArticleViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         print("DATA:", request.data)
         print("FILES:", request.FILES)
-        return super().create(request, *args, **kwargs)
+        payload = normalize_strict(request)
+        serializer = self.get_serializer(data=payload)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_serializer_class(self):
         if self.action == "list":
