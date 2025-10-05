@@ -1,18 +1,19 @@
 from django.core.asgi import get_asgi_application
+
 from channels.routing import ProtocolTypeRouter, URLRouter
 
 from django.urls import path
 
-
-from rest_framework_simplejwt.tokens import AccessToken
-from django.contrib.auth.models import AnonymousUser
-from rest_framework_simplejwt.exceptions import TokenError
-
-from src.apps.accounts.models import User
-from src.apps.chat.consumers import ChatConsumer
+application = get_asgi_application() # noqa
 
 
-application = get_asgi_application()
+from rest_framework_simplejwt.tokens import AccessToken # noqa
+from django.contrib.auth.models import AnonymousUser # noqa
+from rest_framework_simplejwt.exceptions import TokenError # noqa
+
+from src.apps.accounts.models import User # noqa
+from src.apps.chat.consumers import ChatConsumer # noqa
+
 
 
 django_asgi_app = get_asgi_application()
