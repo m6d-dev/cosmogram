@@ -93,7 +93,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
             through_rows = []
             for t in tags_data:
                 t = t.strip()
-                tag_obj, _ = Tag.objects.get_or_create(title=t)
+                tag_obj, _ = Tag.objects.get_or_create(name=t)
                 through_rows.append(
                     ScientificArticleTags(
                         scientific_article=article,
