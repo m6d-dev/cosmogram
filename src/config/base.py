@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # apps
     "src.apps.accounts",
     "src.apps.content",
+    "src.apps.scientific_article",
 ]
 
 MIDDLEWARE = [
