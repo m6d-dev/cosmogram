@@ -6,6 +6,7 @@ from src.apps.content.models.like import Like
 from src.apps.content.models.post import Post
 from src.apps.content.serializers import (
     CommentSerializer,
+    LikeSerializer,
     ListPostSerializer,
     PostSerializer,
 )
@@ -59,17 +60,10 @@ class LikeAPIView(GenericViewSet):
 
     def get_queryset(self):
         return like_service.filter(created_by_id=self.request.user.id)
+    
 
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="post_id",
-                type=OpenApiTypes.INT,
-                required=True,
-                location=OpenApiParameter.QUERY,
-            )
-        ]
-    )
+    serializer_class = LikeSerializer
+
     @action(detail=False, methods=["post"], url_path="add")
     def add_like(self, request, *args, **kwargs):
         """
@@ -86,16 +80,6 @@ class LikeAPIView(GenericViewSet):
         like_service.create(post_id=post_id, created_by_id=request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="post_id",
-                type=OpenApiTypes.INT,
-                required=True,
-                location=OpenApiParameter.QUERY,
-            )
-        ]
-    )
     @action(detail=False, methods=["delete"], url_path="remove")
     def remove_like(self, request, *args, **kwargs):
         """

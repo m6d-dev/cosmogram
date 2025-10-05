@@ -108,3 +108,7 @@ class CommentSerializer(serializers.Serializer):
         if not post_service.exists(id=value):
             raise_validation_error_detail("Post not found")
         return value
+
+
+class LikeSerializer(serializers.Serializer):
+    post_id = serializers.IntegerField()
