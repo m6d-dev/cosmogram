@@ -98,6 +98,7 @@ class AvatarSetSerializer(serializers.ModelSerializer):
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
+
     class Meta:
         model = User
         fields = ("username", "email", "display_name", "description")

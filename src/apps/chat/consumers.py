@@ -27,7 +27,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.groups = set()
 
         personal = f"user-{self.user.id}"
-        print(self.channel_layer)
         await self.channel_layer.group_add(personal, self.channel_name)
         self.groups.add(personal)
 
@@ -161,30 +160,28 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         ]
 
 
-
 def concat_name(user):
     return str(user.username)
 
 
 class NotificationConsumer(AsyncJsonWebsocketConsumer):
     groups: set
+
     async def connect(self):
         self.groups = set()
         self.user = self.scope["user"]
         group = await sync_to_async(concat_name)(self.user)
         await self.add_group(group)
         await self.accept()
-        print("websocket connected successfully!")
-            
+
     async def add_group(self, group):
         await self.channel_layer.group_add(group, self.channel_name)
         self.groups.add(group)
-        
+
     async def disconnect(self, code):
         for group in self.groups:
             await self.channel_layer.group_discard(group, self.channel_layer)
         await self.disconnect()
-        
+
     async def send_notification(self, event: Dict):
         await self.send_json(content=event["data"])
-        

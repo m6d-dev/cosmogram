@@ -4,16 +4,15 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 
 from django.urls import path
 
-application = get_asgi_application() # noqa
+application = get_asgi_application()  # noqa
 
 
-from rest_framework_simplejwt.tokens import AccessToken # noqa
-from django.contrib.auth.models import AnonymousUser # noqa
-from rest_framework_simplejwt.exceptions import TokenError # noqa
+from rest_framework_simplejwt.tokens import AccessToken  # noqa
+from django.contrib.auth.models import AnonymousUser  # noqa
+from rest_framework_simplejwt.exceptions import TokenError  # noqa
 
-from src.apps.accounts.models import User # noqa
-from src.apps.chat.consumers import ChatConsumer, NotificationConsumer # noqa
-
+from src.apps.accounts.models import User  # noqa
+from src.apps.chat.consumers import ChatConsumer, NotificationConsumer  # noqa
 
 
 django_asgi_app = get_asgi_application()
@@ -30,7 +29,7 @@ class WebSocketJWTAuthMiddleware:
     async def __call__(self, scope, receive, send):
         scope["user"] = AnonymousUser()
         token = self.get_token_from_path(scope["path"])
-    
+
         try:
             access_token = AccessToken(token)
             scope["user"] = await get_user(access_token["user_id"])
@@ -56,7 +55,7 @@ application = ProtocolTypeRouter(
                     path(
                         r"ws/notifications/<str:token>",
                         NotificationConsumer.as_asgi(),
-                    )
+                    ),
                 ]
             ),
         ),

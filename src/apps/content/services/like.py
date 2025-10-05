@@ -3,6 +3,7 @@ from src.apps.content.repositories.like import LikeRepository, like_repo
 from src.apps.content.services.post_like import post_like_service
 from src.utils.bases.services import AbstractService
 from django.db import transaction
+from src.apps.notifications.services import PostLikeNotify
 
 
 class LikeService(AbstractService[Like]):
@@ -12,7 +13,9 @@ class LikeService(AbstractService[Like]):
     @transaction.atomic
     def create(self, **kwargs):
         instance = super().create(**kwargs)
-        post_like_service.create(post_id=kwargs.get("post_id"), like=instance)
+        post = post_like_service.create(post_id=kwargs.get("post_id"), like=instance)
+        obj = PostLikeNotify(instance.id, post.created_by)
+        obj.notify()
         return instance
 
     @transaction.atomic
