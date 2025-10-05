@@ -32,7 +32,7 @@ class ScientificArticleCommentListSerializer(serializers.Serializer):
 
 
 class ScientificArticleImageSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=25)
+    title = serializers.CharField(max_length=90)
     image = serializers.ImageField()
 
     def create(self, validated_data):
@@ -40,14 +40,14 @@ class ScientificArticleImageSerializer(serializers.Serializer):
 
 
 class ScientificArticleTagsSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=25, required=False)  # имя тега
+    title = serializers.CharField(max_length=60, required=False)  # имя тега
 
     def create(self, validated_data):
         raise NotImplementedError("Use parent serializer to create tags.")
 
 
 class ScientificArticleFileSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=25)
+    title = serializers.CharField(max_length=60)
     file = serializers.FileField()
 
     def create(self, validated_data):
