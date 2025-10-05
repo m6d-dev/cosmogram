@@ -83,6 +83,7 @@ class UserMeSerializer(serializers.Serializer):
     email = serializers.EmailField()
     avatar = serializers.ImageField()
     subscription_count = serializers.IntegerField()
+    description = serializers.CharField()
     subscribers_count = serializers.IntegerField()
 
 
@@ -95,9 +96,10 @@ class AvatarSetSerializer(serializers.ModelSerializer):
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
+    description = serializers.CharField(required=False)
     class Meta:
         model = User
-        fields = ("username", "email", "display_name")
+        fields = ("username", "email", "display_name", "description")
 
     def update(self, instance, validated_data):
         return super().update(instance=instance, validated_data=validated_data)
