@@ -1,0 +1,125 @@
+services:
+  nginx:
+    networks:
+        - cosmogram
+        - traefik
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+      args:
+        - NGINX_CONF=${NGINX_CONF}
+
+    restart: on-failure
+    expose:
+      - "${PROXY_INTERNAL_PORT}"
+    volumes:
+      - static_files:/code/static
+      - media_files:/code/media
+    depends_on:
+      - api
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${TRAEFIK_LABEL_SERVICE}.rule=Host(`$DOMAIN_URL`)"
+      - "traefik.http.routers.${TRAEFIK_LABEL_SERVICE}.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${TRAEFIK_LABEL_SERVICE}.entrypoints=web,websecure"
+      - "traefik.http.services.${TRAEFIK_LABEL_SERVICE}.loadbalancer.server.port=${PROXY_INTERNAL_PORT}"
+      - "traefik.http.routers.erp.middlewares=error-handler@file"
+
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - ENVIRONMENT=${ENVIRONMENT}
+    restart: on-failure
+    command: sh scripts/start_api.sh
+    env_file:
+      - .env
+    expose:
+      - "${SERVER_PORT}"
+    volumes:
+      - static_files:/code/static
+      - media_files:/code/media
+      - api_temp_files:/code/temp_files
+      - api_backups:/code/backups
+    depends_on:
+      - db
+    networks:
+      - cosmogram
+
+  worker:
+    build: .
+    restart: on-failure
+    command: 'celery -A src.config.celery worker --loglevel=info'
+    depends_on:
+      - api
+      - redis
+    volumes:
+      - static_files:/code/static
+      - media_files:/code/media
+      - api_temp_files:/code/temp_files
+    expose:
+      - "${SERVER_PORT}"
+    networks:
+      - cosmogram
+
+  beat:
+    build: .
+    restart: on-failure
+    command: 'celery -A src.config beat --loglevel=info'
+    depends_on:
+      - redis
+      - api
+      - worker
+    volumes:
+      - static_files:/code/static
+      - media_files:/code/media
+      - api_temp_files:/code/temp_files
+    expose:
+      - "${SERVER_PORT}"
+    networks:
+      - cosmogram
+
+  db:
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_EXTERNAL_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    image: postgres:latest
+    networks:
+      - cosmogram
+
+  redis:
+    restart: always
+    expose:
+      - "${MQ_PORT}"
+    command:
+      ["redis-server", "--requirepass", "${MQ_PASSWORD}", "--port", "${MQ_PORT}"]
+    volumes:
+      - redis_data:/var/lib/redis/data
+    image: redis:latest
+    networks:
+      - cosmogram
+
+volumes:
+  api_temp_files:
+  api_backups:
+  static_files:
+  media_files:
+  postgres_data:
+  redis_data:
+
+networks:
+  cosmogram:
+    driver: bridge
+    name: cosmogram
+
+  traefik:
+    name: traefik
+    external: true
