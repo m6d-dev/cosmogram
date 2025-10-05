@@ -9,12 +9,6 @@ set -o nounset
 
 python3 manage.py migrate
 
-load_required_data() {
-
-    python3 manage.py collectstatic --no-input
-    python3 manage.py initadmin
-}
-
 echo "ENVIRONMENT is ${ENVIRONMENT}"
 
 # Установить рабочую директорию
@@ -32,7 +26,6 @@ cd media/images
 
 cd "${PROJECT_DIR}"
 
-load_required_data
 
 if [[ "${ENVIRONMENT}" == 'development' ]]; then
     python3 manage.py runserver 0.0.0.0:"${SERVER_PORT}"
