@@ -33,6 +33,9 @@ def validate_string(value: str, error_message: str = None) -> None:
     if any(symbol in value for symbol in r"!@#$%^&*+=[]{}\|\\;:<>?"):
         raise_validation_error_detail(error_message)
 
+def raise_validation_error(message: Union[str, Dict]) -> None:
+    raise serializers.ValidationError(message)
+
 
 def get_otp_expire_time():
     return get_datetime() + timedelta(minutes=EMAIL_TOKEN_EXPIRE_MINUTES)
@@ -56,8 +59,8 @@ def generate_random_string(length: int = 8) -> str:
 
 def send_confirm_email(confirmation_url, email):
     send_email_notification(
-        "Подтверждения электронной почты",
-        "Ссылка для подверждения:\n\n{}".format(
+        "Email confirmations",
+        "Verification code:\n\n{}".format(
             confirmation_url,
         ),
         email,
@@ -71,8 +74,8 @@ def send_email_notification(subject: str, message: str, recipients: list | str) 
     try:
         send_mail(subject, message, from_email, recipient_list)
     except (TimeoutError, SMTPServerDisconnected):
-        raise_validation_error_detail(
-            "Ошибка при отправке кода подтверждения. Попробуйте ещё раз"
+        raise_validation_error(
+            "There was an error sending your verification code. Please try again."
         )
 
 

@@ -17,6 +17,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "api.cosmogram.anbor.tj",
     "crm-ecommerce-backend-prod-api-1",
+    "127.0.0.1",
+    "localhost"
 ]
 
 INSTALLED_APPS = [
@@ -129,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-LANGUAGE_CODE = os.environ.get("DJANGO_LANGUAGE_CODE") or "en-us"
+LANGUAGE_CODE = "en-us"
 TIME_ZONE = os.environ.get("DJANGO_TIME_ZONE") or "UTC"
 
 CONFIRMATION_COLDOWN_MINUTES = 1
@@ -178,11 +180,9 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
 }
 
-CELERY_BROKER_URL = (
-    f"redis://{os.environ.get("REDIS_HOST")}:{os.environ.get("REDIS_PORT")}/0"
-)
+CELERY_BROKER_URL = f"redis://{os.environ.get("MQ_HOST")}:{os.environ.get("MQ_PORT")}/0"
 CELERY_RESULT_BACKEND = (
-    f"redis://{os.environ.get("REDIS_HOST")}:{os.environ.get("REDIS_PORT")}/0"
+    f"redis://{os.environ.get("MQ_HOST")}:{os.environ.get("MQ_PORT")}/0"
 )
 
 BOOTSTRAP_KEY = os.getenv("BOOTSTRAP_KEY")

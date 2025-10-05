@@ -51,7 +51,7 @@ class RegistrationAPIView(ViewSet):
         serializer.save()
         return Response(
             data={
-                "data": "Код для подтверждения регистрации отправлена на вашу почту."
+                "data": "The registration confirmation code has been sent to your email."
             },
             status=status.HTTP_201_CREATED,
         )
@@ -68,7 +68,7 @@ class RegistrationAPIView(ViewSet):
             serializer.validated_data.get("email"),
         )
         return Response(
-            data={"data": "Ваш адрес электронной почты успешно подтвержден"},
+            data={"data": "Your email address has been successfully confirmed."},
             status=status.HTTP_200_OK,
         )
 
@@ -88,7 +88,7 @@ class RegistrationAPIView(ViewSet):
 
         return Response(
             data={
-                "data": "Повторная ссылка для подтверждения регистрации отправлена на вашу почту."
+                "data": "A repeat code to confirm your registration has been sent to your email."
             },
             status=status.HTTP_200_OK,
         )
@@ -122,7 +122,7 @@ class ProfileAPIView(ViewSet):
     def get_me(self, request, *args, **kwargs):
         instance = request.user
         if not instance:
-            raise_validation_error_detail("Аккаунт не найден")
+            raise_validation_error_detail("Not found")
 
         serializer = self.get_serializer_class()(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)

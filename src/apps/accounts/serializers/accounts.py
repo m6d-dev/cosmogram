@@ -31,21 +31,21 @@ class RegistrationStep1Serializer(serializers.Serializer):
         Validate that the email is not already in use.
         """
         if user_service.filter(email=value).exists():
-            raise_validation_error_detail("Данный email уже используется")
+            raise_validation_error_detail("This email is already in use")
         validators.validate_email(value)
         return value
 
     def _validate_username_first_character(self, value):
         if not value[0].isalpha():
-            raise_validation_error_detail("Никнейм должен начинаться с буквы")
+            raise_validation_error_detail("The nickname must start with a letter")
 
     def _validate_username_ascii(self, value):
         if not value.isascii():
-            raise_validation_error_detail("Никнейм не может содержать русские символы.")
+            raise_validation_error_detail("The nickname cannot contain Russian characters")
 
     def validate_username(self, value):
         if user_service.exists(username=value):
-            raise_validation_error_detail("Данный никнейм уже занят")
+            raise_validation_error_detail("This nickname is already taken")
         return value
 
     @transaction.atomic

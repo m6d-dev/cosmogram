@@ -34,7 +34,7 @@ class UserService(AbstractService[User]):
         user = user_service.get(email=email, otp=confirmation_url)
 
         if user is None:
-            raise_validation_error_detail("Аккаунт не найден.")
+            raise_validation_error_detail("Invalid otp code.")
         validate_otp_until_confirm(user, "otp", user.otp)
 
         confirm_instance_email(user)
