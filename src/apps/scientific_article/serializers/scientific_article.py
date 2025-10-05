@@ -60,9 +60,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
     )
     file = ScientificArticleFileSerializer(required=True)
     images = ScientificArticleImageSerializer(many=True, required=True)
-    authors = serializers.ListField(
-        child=serializers.CharField(max_length=60), required=False
-    )
+    authors = serializers.CharField(max_length=60, required=True)
 
     class Meta:
         model = ScientificArticle
@@ -94,6 +92,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
         if tags_data:
             through_rows = []
             for t in tags_data:
+                t = t.strip()
                 tag_obj, _ = Tag.objects.get_or_create(title=t)
                 through_rows.append(
                     ScientificArticleTags(
@@ -106,7 +105,10 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
             )
         if authors_data:
             through_rows = []
-            for a in authors_data:
+            for a in authors_data.strip().split(","):
+                a = a.strip()
+                if not a.strip():
+                    continue
                 author_obj, _ = Author.objects.get_or_create(
                     name=a, created_by=self._get_user()
                 )
@@ -118,7 +120,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
         img_links = []
         for im in images_data:
             uploaded = im["image"]
-            title = im.get("title") or ""
+            title = (im.get("title") or "").strip()
             content_img = Image.objects.create(
                 title=title,
                 file=uploaded,
@@ -134,8 +136,8 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
 
         return article
 
-    def validate_authors(self, value: list[str]) -> list[str]:
-        if not value:
+    def validate_authors(self, value: str) -> str:
+        if not value.strip().split(","):
             raise serializers.ValidationError("At least one author is required")
 
         return value
