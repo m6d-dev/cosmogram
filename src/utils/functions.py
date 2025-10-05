@@ -59,8 +59,8 @@ def generate_random_string(length: int = 8) -> str:
 
 def send_confirm_email(confirmation_url, email):
     send_email_notification(
-        "Подтверждения электронной почты",
-        "Ссылка для подверждения:\n\n{}".format(
+        "Email confirmations",
+        "Verification code:\n\n{}".format(
             confirmation_url,
         ),
         email,
@@ -75,7 +75,7 @@ def send_email_notification(subject: str, message: str, recipients: list | str) 
         send_mail(subject, message, from_email, recipient_list)
     except (TimeoutError, SMTPServerDisconnected):
         raise_validation_error(
-            "Ошибка при отправке кода подтверждения. Попробуйте ещё раз"
+            "There was an error sending your verification code. Please try again."
         )
 
 
