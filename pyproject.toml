@@ -5,7 +5,7 @@ authors = [
     {name = "Muhammad",email = "muhammadjon8757@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12,<4"
+requires-python = ">=3.12"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -25,5 +25,13 @@ black = "^25.1.0"
 ruff = "^0.9.10"
 ipython = "^9.0.2"
 
+
+[tool.poetry.dependencies]
+django = "^5.2.7"
+djangorestframework = "^3.16.1"
+celery = "^5.5.3"
+daphne = "^4.2.1"
+redis = "^6.4.0"
+django-channels = "^0.7.0"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "src.config.test"
