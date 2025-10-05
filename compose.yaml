@@ -42,8 +42,6 @@ services:
     volumes:
       - static_files:/code/static
       - media_files:/code/media
-      - api_temp_files:/code/temp_files
-      - api_backups:/code/backups
     depends_on:
       - db
     networks:
@@ -84,11 +82,11 @@ services:
 
   db:
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${POSTGRES_EXTERNAL_PORT}:${POSTGRES_PORT}"
+      - "${DB_INTERNAL_PORT}:${DB_EXTERNAL_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     image: postgres:latest
