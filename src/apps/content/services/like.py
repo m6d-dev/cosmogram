@@ -13,8 +13,8 @@ class LikeService(AbstractService[Like]):
     @transaction.atomic
     def create(self, **kwargs):
         instance = super().create(**kwargs)
-        post = post_like_service.create(post_id=kwargs.get("post_id"), like=instance)
-        obj = PostLikeNotify(instance.id, post.post.created_by)
+        post_like = post_like_service.create(post_id=kwargs.get("post_id"), like=instance)
+        obj = PostLikeNotify(post_like.post.created_by, instance.created_by)
         obj.notify()
         return instance
 
