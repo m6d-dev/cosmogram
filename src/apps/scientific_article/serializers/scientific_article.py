@@ -10,6 +10,20 @@ from src.apps.scientific_article.models import (
     ScientificArticleTags,
     ScientificArticleImage,
 )
+from src.apps.scientific_article.models.scientific_article import Author, ScientificArticleAuthors, \
+    ScientificArticleLike, ScientificArticleComments
+from src.utils.functions import raise_validation_error_detail
+
+
+class UserShortSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    avatar = serializers.ImageField(source="avatar")
+    username = serializers.CharField()
+
+class ScientificArticleCommentListSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    content = serializers.CharField(required=True)
+    created_by = UserShortSerializer()
 
 
 class ScientificArticleImageSerializer(serializers.Serializer):
@@ -41,17 +55,24 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
     )
     file = ScientificArticleFileSerializer(required=True)
     images = ScientificArticleImageSerializer(many=True, required=True)
+    authors = serializers.ListField(
+        child=serializers.CharField(max_length=60), required=False
+    )
 
     class Meta:
         model = ScientificArticle
-        fields = ("title", "content", "tags", "images", "file")
+        fields = ("title", "content", "authors", "tags", "images", "file")
 
     def is_valid(self, *, raise_exception=False):
         return super().is_valid(raise_exception=raise_exception)
 
+    def _get_user(self):
+        return self.context["request"].user
+
     @transaction.atomic
     def create(self, validated_data):
         tags_data = validated_data.pop("tags", [])
+        authors_data = validated_data.pop("authors", [])
         file_data = validated_data.pop("file")
         images_data = validated_data.pop("images")
 
@@ -78,6 +99,17 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
             ScientificArticleTags.objects.bulk_create(
                 through_rows, ignore_conflicts=True
             )
+        if authors_data:
+            through_rows = []
+            for a in authors_data:
+                author_obj, _ = Author.objects.get_or_create(
+                    name=a,
+                    created_by=self._get_user()
+                )
+                through_rows.append(author_obj)
+            ScientificArticleAuthors.objects.bulk_create(
+                through_rows, ignore_conflicts=True
+            )
 
         img_links = []
         for im in images_data:
@@ -98,13 +130,19 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
 
         return article
 
+    def validate_authors(self, value: list[str]) -> list[str]:
+        if not value:
+            raise serializers.ValidationError("At least one author is required")
+
+        return value
+
     def validate_images(self, images):
         if not images:
-            raise serializers.ValidationError("Нужна хотя бы одна картинка.")
+            raise serializers.ValidationError("At leat one image is required.")
         titles = [i.get("title") for i in images if i.get("title")]
         if len(titles) != len(set(titles)):
             raise serializers.ValidationError(
-                "Дублируются названия изображений внутри запроса."
+                "Images titles must be unique. "
             )
         return images
 
@@ -140,6 +178,8 @@ class ScientificArticleListSerializer(serializers.ModelSerializer, RelativeURLMi
             "tags",
             "cover_image",
             "file",
+            "comments_count",
+            "likes_count"
         )
 
     def get_content_preview(self, obj):
@@ -170,6 +210,8 @@ class ScientificArticleDetailSerializer(serializers.ModelSerializer, RelativeURL
     tags = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
     file = serializers.SerializerMethodField()
+    authors = serializers.SerializerMethodField()
+    comments = ScientificArticleCommentListSerializer(many=True, required=False)
 
     class Meta:
         model = ScientificArticle
@@ -177,6 +219,7 @@ class ScientificArticleDetailSerializer(serializers.ModelSerializer, RelativeURL
             "id",
             "title",
             "content",
+            "authors",
             "tags",
             "images",
             "file",
@@ -184,6 +227,9 @@ class ScientificArticleDetailSerializer(serializers.ModelSerializer, RelativeURL
 
     def get_tags(self, obj):
         return [t.title for t in obj.tags.all()]
+
+    def get_authors(self, obj):
+        return [a.name for a in obj.authors.all()]
 
     def get_images(self, obj):
         links = getattr(obj, "prefetched_images", None)
@@ -205,3 +251,53 @@ class ScientificArticleDetailSerializer(serializers.ModelSerializer, RelativeURL
     def get_file(self, obj):
         file_field = getattr(getattr(obj, "file", None), "file", None)
         return self.to_relative_path(getattr(file_field, "url", None))
+
+
+class ScientificArticleLikeCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScientificArticleLike
+        fields = (
+            "scientific_article",
+        )
+
+    def _get_user(self):
+        return self.context["request"].user
+
+    def validate_scientific_article(self, obj: ScientificArticle):
+        if obj.likes.filter(created_by=self._get_user()).exists():
+            raise_validation_error_detail("Already liked.")
+        return obj
+
+    def create(self, validated_data):
+        scientific_article = validated_data.pop("scientific_article")
+
+        ScientificArticleLike.objects.create(
+            created_by=self.context["request"].user,
+            scientific_article=scientific_article
+        )
+
+        scientific_article.likes_count += 1
+        scientific_article.save(update_fields=["likes_count"])
+
+        return scientific_article
+
+class ScientificArticleCommentCreateSerializer(serializers.ModelSerializer, RelativeURLMixin):
+    class Meta:
+        model = ScientificArticleComments
+        fields = (
+            "scientific_article",
+            "content"
+        )
+
+    def create(self, validated_data):
+        scientific_article = validated_data.pop("scientific_article")
+        ScientificArticleComments.objects.create(
+            scientific_article=scientific_article,
+            created_by=self.context["request"].user,
+            **validated_data
+        )
+
+        scientific_article.comments_count += 1
+        scientific_article.save(update_fields=["comments_count"])
+
+        return scientific_article

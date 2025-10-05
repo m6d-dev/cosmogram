@@ -4,6 +4,13 @@ from django.db.models import Index
 from src.utils.bases.models import AbstractAuditableModel, AbstractTimestampsModel
 
 
+class Author(AbstractAuditableModel, AbstractTimestampsModel):
+    name = models.CharField(max_length=60, unique=True, db_index=True)
+
+    updated_by = None
+    updated_at = None
+
+
 class ScientificArticle(AbstractAuditableModel, AbstractTimestampsModel):
     title = models.CharField(max_length=255, db_index=True)
     content = models.TextField()
@@ -20,9 +27,34 @@ class ScientificArticle(AbstractAuditableModel, AbstractTimestampsModel):
         through="ScientificArticleTags",
         related_name="scientific_articles",
     )
+    authors = models.ManyToManyField(
+        "authors.Author",
+        through="ScientificArticleAuthors",
+    )
+    likes_count = models.PositiveIntegerField(default=0)
+    comments_count = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ["title"]
+        ordering = ["-created_at"]
+        indexes = [
+            Index(fields=["created_at"], name="idx_scientific_article_created_at"),
+        ]
+
+
+class ScientificArticleAuthors(AbstractAuditableModel):
+    author = models.ForeignKey(
+        "Author",
+        on_delete=models.CASCADE,
+        related_name="scientific_articles",
+        null=False,
+        blank=False,
+    )
+    scientific_article = models.ForeignKey(
+        "ScientificArticle",
+        on_delete=models.CASCADE,
+        db_index=True
+    )
+
 
 
 class ScientificArticleTags(AbstractAuditableModel, AbstractTimestampsModel):
@@ -71,36 +103,30 @@ class ScientificArticleImage(AbstractAuditableModel, AbstractTimestampsModel):
 
 
 class ScientificArticleLike(AbstractAuditableModel, AbstractTimestampsModel):
-    like = models.ForeignKey(
-        "content.Like",
-        on_delete=models.CASCADE,
-    )
     scientific_article = models.ForeignKey(
         "ScientificArticle",
         on_delete=models.CASCADE,
+        related_name="likes"
     )
 
     updated_at = None
     updated_by = None
 
     class Meta:
-        ordering = ["like"]
         indexes = [Index(fields=["scientific_article"])]
 
 
 class ScientificArticleComments(AbstractAuditableModel, AbstractTimestampsModel):
-    comment = models.ForeignKey(
-        "content.Comment",
-        on_delete=models.CASCADE,
-    )
+    content = models.TextField()
     scientific_article = models.ForeignKey(
         "ScientificArticle",
         on_delete=models.CASCADE,
+        related_name="comments",
     )
 
     updated_at = None
     updated_by = None
 
     class Meta:
-        ordering = ["comment"]
-        indexes = [Index(fields=["scientific_article"])]
+        ordering = ["scientific_article", "-created_at"]
+        indexes = [Index(fields=["scientific_article", "created_at"])]
