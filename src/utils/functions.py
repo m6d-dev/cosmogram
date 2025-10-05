@@ -33,6 +33,9 @@ def validate_string(value: str, error_message: str = None) -> None:
     if any(symbol in value for symbol in r"!@#$%^&*+=[]{}\|\\;:<>?"):
         raise_validation_error_detail(error_message)
 
+def raise_validation_error(message: Union[str, Dict]) -> None:
+    raise serializers.ValidationError(message)
+
 
 def get_otp_expire_time():
     return get_datetime() + timedelta(minutes=EMAIL_TOKEN_EXPIRE_MINUTES)
@@ -71,7 +74,7 @@ def send_email_notification(subject: str, message: str, recipients: list | str) 
     try:
         send_mail(subject, message, from_email, recipient_list)
     except (TimeoutError, SMTPServerDisconnected):
-        raise_validation_error_detail(
+        raise_validation_error(
             "Ошибка при отправке кода подтверждения. Попробуйте ещё раз"
         )
 
