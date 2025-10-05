@@ -1,8 +1,8 @@
 services:
   nginx:
     networks:
-        - cosmogram
-        - traefik
+      - cosmogram
+      - traefik
     build:
       context: nginx
       dockerfile: Dockerfile
