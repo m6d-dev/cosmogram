@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     # apps
     "src.apps.accounts",
     "src.apps.content",
+    "src.apps.chat",
 ]
 
 MIDDLEWARE = [
