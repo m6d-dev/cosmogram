@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "src.apps.accounts",
     "src.apps.content",
     "src.apps.scientific_article",
+    "src.apps.chat",
 ]
 
 MIDDLEWARE = [
@@ -113,9 +114,14 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
-    }
+    },
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {

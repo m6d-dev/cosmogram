@@ -30,7 +30,7 @@ class PostAPIView(ModelViewSet):
         return ListPostSerializer
 
     def get_queryset(self):
-        return post_service.all()
+        return post_service.all().order_by("-created_by")
 
     def destroy(self, request, *args, **kwargs):
         instance = self.model.objects.filter(
