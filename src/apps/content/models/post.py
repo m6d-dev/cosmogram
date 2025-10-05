@@ -1,3 +1,4 @@
+from src.apps.content.models.tag import Tag
 from src.apps.content.models.image import Image
 from src.utils.bases.models import AbstractAuditableModel, AbstractTimestampsModel
 from django.db import models
@@ -10,6 +11,12 @@ class Post(AbstractTimestampsModel, AbstractAuditableModel):
     content = models.TextField(verbose_name="Контент")
     images = models.ManyToManyField(
         Image, through="PostImage", related_name="posts", blank=True
+    )
+
+    tags = models.ManyToManyField(
+        Tag,
+        related_name="posts",
+        blank=True
     )
 
     def __str__(self):

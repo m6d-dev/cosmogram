@@ -25,7 +25,7 @@ class UserService(AbstractService[User]):
         if password:
             user.set_password(password)
         user.save()
-        self._send_confirm_email(user=user)
+        # self._send_confirm_email(user=user)
         return user
 
     def confirm_user_url(
