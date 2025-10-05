@@ -110,9 +110,13 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
                 if not a.strip():
                     continue
                 author_obj, _ = Author.objects.get_or_create(
-                    name=a, created_by=self._get_user()
+                    name=a, defaults={"created_by_id": self._get_user().id}
                 )
-                through_rows.append(author_obj)
+                obj = ScientificArticleAuthors(
+                    scientific_article=article,
+                    author_obj=author_obj
+                )
+                through_rows.append(obj)
             ScientificArticleAuthors.objects.bulk_create(
                 through_rows, ignore_conflicts=True
             )
