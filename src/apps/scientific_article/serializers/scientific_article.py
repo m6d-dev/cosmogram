@@ -36,7 +36,9 @@ class ScientificArticleFileSerializer(serializers.Serializer):
 
 
 class ScientificArticleCreateSerializer(serializers.ModelSerializer):
-    tags = ScientificArticleTagsSerializer(many=True, required=False)
+    tags = serializers.ListField(
+        child=serializers.CharField(max_length=50), required=False
+    )
     file = ScientificArticleFileSerializer(required=True)
     images = ScientificArticleImageSerializer(many=True, required=True)
 
@@ -66,7 +68,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
         if tags_data:
             through_rows = []
             for t in tags_data:
-                tag_obj, _ = Tag.objects.get_or_create(title=t["title"])
+                tag_obj, _ = Tag.objects.get_or_create(title=t)
                 through_rows.append(
                     ScientificArticleTags(
                         scientific_article=article,

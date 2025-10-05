@@ -23,11 +23,7 @@ class User(AbstractBaseUser, AbstractTimestampsModel):
 
     confirmed = models.BooleanField(default=False)
 
-    description = models.TextField(
-        verbose_name="Описание",
-        default=""
-    )
-
+    description = models.TextField(verbose_name="Описание", default="")
 
     subscription_count = models.IntegerField(default=0)
     subscribers_count = models.IntegerField(default=0)
