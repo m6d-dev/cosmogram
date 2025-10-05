@@ -5,7 +5,11 @@ from django.utils.text import Truncator
 from rest_framework import serializers
 
 from src.apps.content.models import File, Tag, Image
-from src.apps.scientific_article.models import ScientificArticle, ScientificArticleTags, ScientificArticleImage
+from src.apps.scientific_article.models import (
+    ScientificArticle,
+    ScientificArticleTags,
+    ScientificArticleImage,
+)
 
 
 class ScientificArticleImageSerializer(serializers.Serializer):
@@ -17,7 +21,7 @@ class ScientificArticleImageSerializer(serializers.Serializer):
 
 
 class ScientificArticleTagsSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=25)  # имя тега
+    title = serializers.CharField(max_length=25, required=False)  # имя тега
 
     def create(self, validated_data):
         raise NotImplementedError("Use parent serializer to create tags.")
@@ -39,6 +43,9 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScientificArticle
         fields = ("title", "content", "tags", "images", "file")
+
+    def is_valid(self, *, raise_exception=False):
+        return super().is_valid(raise_exception=raise_exception)
 
     @transaction.atomic
     def create(self, validated_data):
@@ -66,7 +73,9 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
                         tag=tag_obj,
                     )
                 )
-            ScientificArticleTags.objects.bulk_create(through_rows, ignore_conflicts=True)
+            ScientificArticleTags.objects.bulk_create(
+                through_rows, ignore_conflicts=True
+            )
 
         img_links = []
         for im in images_data:
@@ -92,7 +101,9 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Нужна хотя бы одна картинка.")
         titles = [i.get("title") for i in images if i.get("title")]
         if len(titles) != len(set(titles)):
-            raise serializers.ValidationError("Дублируются названия изображений внутри запроса.")
+            raise serializers.ValidationError(
+                "Дублируются названия изображений внутри запроса."
+            )
         return images
 
 
@@ -178,13 +189,15 @@ class ScientificArticleDetailSerializer(serializers.ModelSerializer, RelativeURL
             links = obj.scientificarticleimage_set.select_related("image").all()
 
         result = []
-        for l in links:
-            file_field = getattr(getattr(l, "image", None), "file", None)
+        for lee in links:
+            file_field = getattr(getattr(lee, "image", None), "file", None)
             path = self.to_relative_path(getattr(file_field, "url", None))
-            result.append({
-                "title": getattr(l, "title", "") or "",
-                "path": path,
-            })
+            result.append(
+                {
+                    "title": getattr(lee, "title", "") or "",
+                    "path": path,
+                }
+            )
         return result
 
     def get_file(self, obj):

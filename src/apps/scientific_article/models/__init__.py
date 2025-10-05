@@ -3,14 +3,14 @@ from .scientific_article import (
     ScientificArticleTags,
     ScientificArticleImage,
     ScientificArticleLike,
-    ScientificArticleComments
+    ScientificArticleComments,
 )
 
 
 __all__ = [
-    'ScientificArticleComments',
-    'ScientificArticleLike',
-    'ScientificArticleImage',
-    'ScientificArticleTags',
-    'ScientificArticle'
+    "ScientificArticleComments",
+    "ScientificArticleLike",
+    "ScientificArticleImage",
+    "ScientificArticleTags",
+    "ScientificArticle",
 ]

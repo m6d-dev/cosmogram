@@ -5,8 +5,6 @@ from src.apps.content.services.tag import tag_service
 from src.apps.content.services.like import like_service
 from src.apps.content.models.post import Post
 from src.apps.content.models.comment import Comment
-from src.apps.content.models.like import Like
-from src.apps.content.services.post_like import post_like_service
 from src.utils.functions import raise_validation_error_detail
 
 
@@ -62,6 +60,7 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ("id", "content")
 
+
 class ListPostSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField()
@@ -75,7 +74,7 @@ class ListPostSerializer(serializers.Serializer):
 
     def get_likes(self, value):
         return value.likes.count()
-    
+
 
 class CreateLikeSerializer(serializers.Serializer):
     created_by = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -85,7 +84,9 @@ class CreateLikeSerializer(serializers.Serializer):
         return like_service.create(**validated_data)
 
     def validate(self, attrs):
-        like_id = like_service.filter(post_id=attrs.get("post_id"), created_by_id=attrs.get("created_by").id).values("id")
+        like_id = like_service.filter(
+            post_id=attrs.get("post_id"), created_by_id=attrs.get("created_by").id
+        ).values("id")
         if like_id:
             raise_validation_error_detail("You have already liked this post.")
 

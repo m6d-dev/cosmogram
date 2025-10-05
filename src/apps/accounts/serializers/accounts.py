@@ -73,6 +73,7 @@ class UserSerializer(serializers.Serializer):
     display_name = serializers.CharField()
     avatar = serializers.ImageField()
 
+
 class UserMeSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     confirmed = serializers.BooleanField()

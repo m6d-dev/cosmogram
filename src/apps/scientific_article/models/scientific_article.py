@@ -27,7 +27,9 @@ class ScientificArticle(AbstractAuditableModel, AbstractTimestampsModel):
 
 class ScientificArticleTags(AbstractAuditableModel, AbstractTimestampsModel):
     tag = models.ForeignKey("content.Tag", on_delete=models.CASCADE)
-    scientific_article = models.ForeignKey("ScientificArticle", on_delete=models.CASCADE)
+    scientific_article = models.ForeignKey(
+        "ScientificArticle", on_delete=models.CASCADE
+    )
 
     updated_at = None
     updated_by = None
@@ -48,7 +50,9 @@ class ScientificArticleTags(AbstractAuditableModel, AbstractTimestampsModel):
 class ScientificArticleImage(AbstractAuditableModel, AbstractTimestampsModel):
     title = models.CharField(max_length=255, db_index=True)
     image = models.ForeignKey("content.Image", on_delete=models.CASCADE)
-    scientific_article = models.ForeignKey("ScientificArticle", on_delete=models.CASCADE)
+    scientific_article = models.ForeignKey(
+        "ScientificArticle", on_delete=models.CASCADE
+    )
 
     updated_at = None
     updated_by = None
@@ -81,9 +85,7 @@ class ScientificArticleLike(AbstractAuditableModel, AbstractTimestampsModel):
 
     class Meta:
         ordering = ["like"]
-        indexes = [
-            Index(fields=["scientific_article"])
-        ]
+        indexes = [Index(fields=["scientific_article"])]
 
 
 class ScientificArticleComments(AbstractAuditableModel, AbstractTimestampsModel):
@@ -101,6 +103,4 @@ class ScientificArticleComments(AbstractAuditableModel, AbstractTimestampsModel)
 
     class Meta:
         ordering = ["comment"]
-        indexes = [
-            Index(fields=["scientific_article"])
-        ]
+        indexes = [Index(fields=["scientific_article"])]

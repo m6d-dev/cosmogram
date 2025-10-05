@@ -14,11 +14,9 @@ class Like(AbstractAuditableModel, AbstractTimestampsModel):
     class Meta:
         constraints = [
             UniqueConstraint(
-                fields=["post", "created_by"],
-                name="unique_user_post_like"
+                fields=["post", "created_by"], name="unique_user_post_like"
             )
         ]
-
 
 
 class PostLike(models.Model):
