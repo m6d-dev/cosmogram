@@ -5,4 +5,5 @@ from src.utils.bases.repositories import AbstractRepository
 class TagRepository(AbstractRepository[Tag]):
     model = Tag
 
+
 tag_repo = TagRepository()

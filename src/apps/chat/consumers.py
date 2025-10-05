@@ -1,6 +1,7 @@
 # consumers.py
 from typing import Dict
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from .models import Message
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -9,11 +10,11 @@ from asgiref.sync import sync_to_async
 
 User = get_user_model()
 
-from .models import Message
 
 def chat_group_name(user1_id: int, user2_id: int) -> str:
     a, b = sorted([int(user1_id), int(user2_id)])
     return f"chat_{a}_{b}"
+
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -91,7 +92,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_send(
                 group,
                 {
-                    "type": "chat.message",  
+                    "type": "chat.message",
                     "message": payload,
                 },
             )
@@ -140,10 +141,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def get_last_messages(self, user1_id, user2_id, limit=50):
         a, b = sorted([int(user1_id), int(user2_id)])
-        qs = Message.objects.filter(
-        ).filter(
-            (Q(sender_id=a) & Q(recipient_id=b)) | (Q(sender_id=b) & Q(recipient_id=a))
-        ).order_by("-created_at")[:limit]
+        qs = (
+            Message.objects.filter()
+            .filter(
+                (Q(sender_id=a) & Q(recipient_id=b))
+                | (Q(sender_id=b) & Q(recipient_id=a))
+            )
+            .order_by("-created_at")[:limit]
+        )
         return [
             {
                 "id": m.id,

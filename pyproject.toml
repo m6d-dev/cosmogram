@@ -33,5 +33,6 @@ celery = "^5.5.3"
 daphne = "^4.2.1"
 redis = "^6.4.0"
 django-channels = "^0.7.0"
+rest-framework-simplejwt = "^0.0.2"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "src.config.test"

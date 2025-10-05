@@ -1,5 +1,6 @@
 from src.apps.content.models.post import Post
 from src.utils.bases.models import AbstractAuditableModel, AbstractTimestampsModel
+from django.db.models import UniqueConstraint
 from django.db import models
 
 
@@ -9,6 +10,13 @@ class Like(AbstractAuditableModel, AbstractTimestampsModel):
         on_delete=models.CASCADE,
         related_name="likes",
     )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=["post", "created_by"], name="unique_user_post_like"
+            )
+        ]
 
 
 class PostLike(models.Model):

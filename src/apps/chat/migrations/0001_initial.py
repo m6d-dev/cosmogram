@@ -15,47 +15,107 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Chat',
+            name="Chat",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Время создания')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Время изменения')),
-                ('user1', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chats_as_user1', to=settings.AUTH_USER_MODEL)),
-                ('user2', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chats_as_user2', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Время создания"
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="Время изменения"),
+                ),
+                (
+                    "user1",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chats_as_user1",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "user2",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chats_as_user2",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Message',
+            name="Message",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('is_read', models.BooleanField(default=False)),
-                ('chat', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='chat.chat')),
-                ('sender', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sent_messages', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("is_read", models.BooleanField(default=False)),
+                (
+                    "chat",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="messages",
+                        to="chat.chat",
+                    ),
+                ),
+                (
+                    "sender",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sent_messages",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ('created_at',),
+                "ordering": ("created_at",),
             },
         ),
         migrations.AddIndex(
-            model_name='chat',
-            index=models.Index(fields=['user1', 'user2'], name='chat_chat_user1_i_825fae_idx'),
+            model_name="chat",
+            index=models.Index(
+                fields=["user1", "user2"], name="chat_chat_user1_i_825fae_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='chat',
-            index=models.Index(fields=['updated_at'], name='chat_chat_updated_ffb0a9_idx'),
+            model_name="chat",
+            index=models.Index(
+                fields=["updated_at"], name="chat_chat_updated_ffb0a9_idx"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='chat',
-            unique_together={('user1', 'user2')},
+            name="chat",
+            unique_together={("user1", "user2")},
         ),
         migrations.AddIndex(
-            model_name='message',
-            index=models.Index(fields=['chat', 'created_at'], name='chat_messag_chat_id_0c7b25_idx'),
+            model_name="message",
+            index=models.Index(
+                fields=["chat", "created_at"], name="chat_messag_chat_id_0c7b25_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='message',
-            index=models.Index(fields=['sender', 'created_at'], name='chat_messag_sender__b02346_idx'),
+            model_name="message",
+            index=models.Index(
+                fields=["sender", "created_at"], name="chat_messag_sender__b02346_idx"
+            ),
         ),
     ]
