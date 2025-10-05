@@ -1,4 +1,7 @@
 import random
+import re
+from typing import Any, List
+from django.http import HttpRequest
 import string
 from rest_framework import serializers
 from typing import Dict, Union
@@ -124,3 +127,119 @@ def check_field_confirmed(instance: models.Model, field: str) -> None:
     """
     if getattr(instance, field):
         raise_validation_error_detail("Уже подтверждено.")
+
+
+def _get_first(data, key: str) -> Any:
+    # data может быть QueryDict; берём одно значение (или None)
+    if hasattr(data, "getlist"):
+        lst = data.getlist(key)
+        if lst:
+            return lst[0]
+    return data.get(key)
+
+
+def _parse_tags(data) -> List[str]:
+    """
+    Принимаем:
+      tags=AI  (повторяющиеся ключи)
+      tags=AI&tags=ML
+      tags[0]=AI&tags[1]=ML
+    """
+    tags: List[str] = []
+
+    # 1) повторяющиеся tags
+    if hasattr(data, "getlist"):
+        for t in data.getlist("tags"):
+            if t and t.strip():
+                tags.append(t.strip())
+
+    # 2) индексированные tags[i]
+    rx_tag_idx = re.compile(r"^tags\[(\d+)\]$")
+    indexed: Dict[int, str] = {}
+    for k in data.keys():
+        m = rx_tag_idx.match(k)
+        if not m:
+            continue
+        idx = int(m.group(1))
+        v = _get_first(data, k)
+        if v and str(v).strip():
+            indexed[idx] = str(v).strip()
+
+    if indexed:
+        for i in sorted(indexed.keys()):
+            tags.append(indexed[i])
+
+    return tags
+
+
+def _parse_file(data) -> Dict[str, Any] | None:
+    """
+    Принимаем строго:
+      file[title], file[file]
+    """
+    title = _get_first(data, "file[title]")
+    blob = _get_first(data, "file[file]")  # это будет InMemoryUploadedFile внутри data
+
+    if blob is None and title is None:
+        return None
+
+    # Пусть serializer валидирует обязательность. Здесь просто собираем.
+    return {"title": title, "file": blob}
+
+
+def _parse_indexed_objects(
+    data, prefix: str, fields: List[str]
+) -> List[Dict[str, Any]]:
+    """
+    Для изображений:
+      images[0][title], images[0][image]
+      images[1][title], images[1][image]
+
+    Возвращает список словарей с указанными полями, отсутствующие поля = None.
+    """
+    # паттерн: images[<idx>][<field>]
+    rx = re.compile(rf"^{re.escape(prefix)}\[(\d+)\]\[(\w+)\]$")
+    bag: Dict[int, Dict[str, Any]] = {}
+
+    for k in data.keys():
+        m = rx.match(k)
+        if not m:
+            continue
+        idx = int(m.group(1))
+        fld = m.group(2)
+        if fld not in fields:
+            continue
+        bag.setdefault(idx, {})
+        bag[idx][fld] = _get_first(data, k)
+
+    # нормализуем: упорядочим по индексу и заполним отсутствующие поля None
+    out: List[Dict[str, Any]] = []
+    for i in sorted(bag.keys()):
+        item = {f: bag[i].get(f) for f in fields}
+        out.append(item)
+    return out
+
+
+def normalize_strict(request: HttpRequest) -> Dict[str, Any]:
+    """
+    Строго под ScientificArticleCreateSerializer:
+      fields = ("title", "content", "authors", "tags", "images", "file")
+    """
+    data = request.data
+
+    title = _get_first(data, "title")
+    content = _get_first(data, "content")
+    authors = _get_first(data, "authors")
+
+    tags = _parse_tags(data)
+    file_ = _parse_file(data)
+    images = _parse_indexed_objects(data, prefix="images", fields=["title", "image"])
+
+    return {
+        "title": title,
+        "content": content,
+        "authors": authors,
+        "tags": tags,
+        "file": file_,
+        "images": images,
+    }
