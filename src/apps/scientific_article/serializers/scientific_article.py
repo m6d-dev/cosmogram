@@ -113,8 +113,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
                     name=a, defaults={"created_by_id": self._get_user().id}
                 )
                 obj = ScientificArticleAuthors(
-                    scientific_article=article,
-                    author=author_obj
+                    scientific_article=article, author=author_obj
                 )
                 through_rows.append(obj)
             ScientificArticleAuthors.objects.bulk_create(
@@ -126,8 +125,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
             uploaded = im["image"]
             title = (im.get("title") or "").strip()
             content_img = Image.objects.create(
-                title=title,
-                file=uploaded,
+                image=uploaded,
             )
             img_links.append(
                 ScientificArticleImage(
