@@ -5,10 +5,10 @@ on:
 
 env:
   # Host specific
-  ENV_FILE: envs/.env.example
+  ENV_FILE: .env.example
   APP_DIR: $HOME/app
 
-  # SSH specific
+  # SSH specifi
   REMOTE_HOST: ${{ vars.REMOTE_HOST }}
   REMOTE_PORT: ${{ vars.REMOTE_HOST_PORT }}
   REMOTE_USER: ${{ vars.REMOTE_HOST_USER }}
@@ -73,9 +73,9 @@ jobs:
             export "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}"
 
             source .env
-            
+
             export "SECRET_KEY=${{ secrets.SECRET_KEY }}"
-            
+
             echo "Building started at $(date)" >> deployment.logs
 
             nohup bash -c "
