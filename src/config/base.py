@@ -18,7 +18,7 @@ ALLOWED_HOSTS = [
     "api.cosmogram.anbor.tj",
     "crm-ecommerce-backend-prod-api-1",
     "127.0.0.1",
-    "localhost"
+    "localhost",
 ]
 
 INSTALLED_APPS = [
