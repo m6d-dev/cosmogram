@@ -25,7 +25,7 @@ class UserService(AbstractService[User]):
         if password:
             user.set_password(password)
         user.save()
-        # self._send_confirm_email(user=user)
+        self._send_confirm_email(user=user)
         return user
 
     def confirm_user_url(
@@ -34,7 +34,7 @@ class UserService(AbstractService[User]):
         user = user_service.get(email=email, otp=confirmation_url)
 
         if user is None:
-            raise_validation_error_detail("Аккаунт не найден.")
+            raise_validation_error_detail("Invalid otp code.")
         validate_otp_until_confirm(user, "otp", user.otp)
 
         confirm_instance_email(user)
