@@ -14,4 +14,6 @@ def niga(request):
     a.notify()
 
 
-urlpatterns = [path("", NotificationAPIView.as_view()), path("niga", niga)]
+urlpatterns = [
+    path("", NotificationAPIView.as_view()), 
+    ]

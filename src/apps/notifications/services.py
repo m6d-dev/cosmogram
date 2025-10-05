@@ -19,6 +19,20 @@ class PostLikeNotify:
             user_id=self.post_owner.id, content=msg, type=NotifcationType.POST_LIKED
         )
         send_notification(username=self.post_owner.username, notification=notification)
+        
+        
+class PostAddedNotify():
+    def __init__(self, username):
+        self.username = username
+        
+    def notify(self):
+        msg = f"{self.username} added a new post"
+        users = User.objects.all().exclude(username=self.username)
+        for user in users:
+            notification = create_notification(
+                user_id=user.id, content=msg, type=NotifcationType.POST_ADDED
+            )
+            send_notification(user.username, notification=notification)
 
 
 def create_notification(user_id, **kwargs):

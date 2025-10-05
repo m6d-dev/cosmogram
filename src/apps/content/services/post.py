@@ -1,4 +1,5 @@
 from typing import Any, List
+from src.apps.notifications.services import PostAddedNotify
 from src.apps.content.models.tag import Tag
 from src.apps.content.models.post import Post, PostImage
 from src.apps.content.services.image import image_service
@@ -17,6 +18,9 @@ class PostService(AbstractService[Post]):
         instance = super().create(**kwargs)
         self._set_images(instance=instance, images=images)
         self._set_tags(instance=instance, tags=tags)
+        obj = PostAddedNotify(instance.created_by.username)
+        obj.notify()
+        print("Получилось")
         return instance
 
     def update(self, **kwargs):

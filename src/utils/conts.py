@@ -19,3 +19,4 @@ PREFIX_API_VERSION = f"{API_CONST}/{API_VERSION}"
 
 class NotifcationType(IntEnum):
     POST_LIKED = 1
+    POST_ADDED = 2
