@@ -132,6 +132,7 @@ class ScientificArticleCreateSerializer(serializers.ModelSerializer):
                     scientific_article=article,
                     image=content_img,
                     title=title,
+                    created_by=self._get_user(),
                 )
             )
         ScientificArticleImage.objects.bulk_create(img_links)
